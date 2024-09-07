@@ -1,28 +1,51 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
+import reactPlugin from 'eslint-plugin-react';
+import tsPlugin from '@typescript-eslint/eslint-plugin';
+import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
+import prettierPlugin from 'eslint-plugin-prettier';
+import tsParser from '@typescript-eslint/parser';
 
-export default tseslint.config(
-  { ignores: ['dist'] },
+export default [
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ['**/*.{ts,tsx}'],
+    ignores: ['node_modules/**'],
+    files: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.js', 'src/**/*.jsx'],
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      ecmaVersion: 2021,
+      sourceType: 'module',
+      parser: tsParser,
     },
     plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
+      react: reactPlugin,
+      '@typescript-eslint': tsPlugin,
+      'simple-import-sort': simpleImportSortPlugin,
+      prettier: prettierPlugin,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
+      'react/react-in-jsx-scope': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_' },
       ],
+      'prettier/prettier': 'error',
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [
+            ['^react', '^react-dom', '^@react'],
+            ['^@?\\w'],
+            ['^(@|components|utils|hooks|config|lib|services)(/.*|$)'],
+            ['^\\./', '^\\.\\.'],
+            ['^.+\\.(css|scss|sass|less)$'],
+            ['^\\u0000'],
+          ],
+        },
+      ],
+      'simple-import-sort/exports': 'error',
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
     },
   },
-)
+];
